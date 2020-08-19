@@ -8,7 +8,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>人脸登陆</title>
+    <title>人脸比对</title>
     <link rel="stylesheet" href="/static/css/user_form.css">
 </head>
 <body>
@@ -17,7 +17,7 @@
 </header>
 <div class="content">
     <img class="content-logo" src="/static/img/logo.png" alt="logo">
-    <h1 class="content-title">账户登陆</h1>
+    <h1 class="content-title">开始比对</h1>
     <div class="content-form">
         <form method="post"  action="/face/query" enctype="multipart/form-data" >
             <div id="change_margin_1">
@@ -28,12 +28,12 @@
             </div>
             <p id="remind_2"></p>
             <div id="change_margin_3">
-                <input class="content-form-signup" type="submit" value="登陆">
+                <input class="content-form-signup" type="submit" value="比对">
             </div>
         </form>
     </div>
-    <div class="content-login-description">还没有账户？</div>
-    <div><a class="content-login-link" href="face_insert_html">注册</a></div>
+    <div class="content-login-description">还没有录入人脸？</div>
+    <div><a class="content-login-link" href="face_insert_html">录入</a></div>
 </div>
 </body>
 </html>
