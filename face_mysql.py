@@ -14,7 +14,7 @@ class face_mysql:
         db = self.conn_mysql()
         cursor = db.cursor()
         dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sql = "insert into face_json(json,pic_name,pic_path,date,state,uid,ugroup) values('%s' ,'%s','%s','%d','%s','%s') ;" % (
+        sql = "insert into face_json(json,pic_name,pic_path,date,state,uid,ugroup) values('%s' ,'%s','%s', '%s', %d ,'%s','%s') ;" % (
             pic_json, pic_name, pic_path, dt, 1, uid, ugroup)
         #print("sql=",sql)
         try:

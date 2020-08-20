@@ -107,42 +107,50 @@ def face_query():
     ugroup = request.form['ugroup']
     upload_files = request.files['imagefile']
 
+    #设置返回结果
+    result = []
+
     #获取post请求的图片到本地
     file = upload_files
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    print(image_path)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(image_path)
 
-    img = cv2.imread(image_path)
-    image = face_recognition.load_image_file(image_path)
-    face_locations = face_recognition.face_locations(image)
-    emb_array = face_recognition.face_encodings(image, face_locations)
-    face_query = matrix_fun.matrix()
-    #分别获取距离该图片中人脸最相近的人脸信息
-    # pic_min_scores 是数据库中人脸距离（facenet计算人脸相似度根据人脸距离进行的）
-    # pic_min_names 是当时入库时保存的文件名
-    # pic_min_uid  是对应的用户id
-    pic_min_scores, pic_min_names, pic_min_uid = face_query.get_socres(emb_array, ugroup)
+        img = cv2.imread(image_path)
+        image = face_recognition.load_image_file(image_path)
+        face_locations = face_recognition.face_locations(image)
+        emb_array = face_recognition.face_encodings(image, face_locations)
+        face_query = matrix_fun.matrix()
+        #分别获取距离该图片中人脸最相近的人脸信息
+        # pic_min_scores 是数据库中人脸距离（facenet计算人脸相似度根据人脸距离进行的）
+        # pic_min_names 是当时入库时保存的文件名
+        # pic_min_uid  是对应的用户id
+        pic_min_scores, pic_min_names, pic_min_uid = face_query.get_socres(emb_array, ugroup)
 
-    #如果提交的query没有group 则返回
-    if len(pic_min_scores) == 0: return json.dumps({'error': "not found user group"})
+        #如果提交的query没有group 则返回
+        if len(pic_min_scores) == 0: return json.dumps({'error': "not found user group"})
 
-    #设置返回结果
-    result = []
-    for i in range(0, len(pic_min_scores)):
-        if pic_min_scores[i]<MAX_DISTINCT:
-            rdict = {'uid': pic_min_uid[i],
-                    'distance': pic_min_scores[i],
-                    'pic_name': pic_min_names[i] }
-            result.append(rdict)
-    print(result)
+        for i in range(0, len(pic_min_scores)):
+            if pic_min_scores[i]<MAX_DISTINCT:
+                rdict = {'uid': pic_min_uid[i],
+                        'distance': pic_min_scores[i],
+                        'pic_name': pic_min_names[i] }
+                result.append(rdict)
+        print(result)
     if len(result)==0 :
         return json.dumps({"state":"success, but not match face"})
     else:
         return json.dumps(result)
 
+@app.route('/rock/correct', methods=['POST'])
+def rock_correct():
+    return json.dumps({"state":"success"})
+
+@app.route('/rock/split', methods=['POST'])
+def rock_split():
+    return json.dumps({"state":"success"})
 
 # 备用 通过urllib的方式从远程地址获取一个图片到本地
 # 利用该方法可以提交一个图片的url地址，则也是先保存到本地再进行后续处理
@@ -154,23 +162,19 @@ def get_url_imgae(picurl):
         f.write(pic)
     return pic_name
 
-
 @auth.get_password
 def get_password(username):
     if username == 'root':
         return 'root'
     return None
 
-
 @auth.error_handler
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
-
 @app.errorhandler(400)
 def not_found(error):
     return make_response(jsonify({'error': 'Invalid data!'}), 400)
-
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080)

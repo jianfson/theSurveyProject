@@ -3,19 +3,19 @@ the Survey Project.
 
 ## 安装准备
 #### 安装python包 
-如下
-`scipy`
-`scikit-learn`
-`opencv-python`
-`h5py`
-`matplotlib`
-`Pillow`
-`requests`
-`psutil`
-`mysql-connector`
-`Werkzeug`
-`Flask`
+`scipy` 
+`scikit-learn` 
+`opencv-python` 
+`h5py` 
+`matplotlib` 
+`Pillow` 
+`requests` 
+`psutil` 
+`mysql-connector` 
+`Werkzeug` 
+`Flask` 
 `Flask-HTTPAuth` 
+`face_recognition` 
 
 ## 提前建立数据库 
 database.sql 
