@@ -16,6 +16,8 @@ import matrix_fun
 import urllib
 import face_recognition
 import cv2
+import datetime
+import time
 
 app = Flask(__name__)
 # 图片最大为16M
@@ -30,12 +32,14 @@ MAX_DISTINCT=1.22
 from werkzeug.utils import secure_filename
 #设置post请求中获取的图片保存的路径
 UPLOAD_FOLDER = 'pic_tmp/'
+ROCK_FOLDER = 'rock_temp/'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 else:
     pass
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ROCK_FOLDER'] = ROCK_FOLDER
 
 
 def allowed_file(filename):
@@ -44,10 +48,7 @@ def allowed_file(filename):
 
 #当前文件的路径
 pwd = os.getcwd()
-#当前文件的父路径
-father_path=os.path.abspath(os.path.dirname(pwd)+os.path.sep+".")
 
-#获取post中的图片并执行插入到库 返回数据库中保存的id
 @app.route('/')
 def index():
     return render_template("face_login.html")
@@ -58,6 +59,13 @@ def face_insert_html():
 @app.route('/face_query_html')
 def face_query_html():
     return render_template("face_login.html")
+
+@app.route('/rock_correct')
+def rock_correct_html():
+    return render_template("rock_correct.html")
+@app.route('/rock_split')
+def rock_split_html():
+    return render_template("rock_split.html")
 
 #获取post中的图片并执行插入到库 返回数据库中保存的id
 @app.route('/face/insert', methods=['POST'])
@@ -70,21 +78,22 @@ def face_insert():
     #从post请求图片保存到本地路径中
     file = upload_files
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        filename = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-") + secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    image_path = os.path.join(pwd, image_path)
     print(image_path)
 
-    img = cv2.imread(image_path)
+    #img = cv2.imread(image_path)
     image = face_recognition.load_image_file(image_path)
     face_locations = face_recognition.face_locations(image)
     emb_array = face_recognition.face_encodings(image, face_locations)
-    filename_base, file_extension = os.path.splitext(image_path)
+    filename_base, file_extension = os.path.splitext(filename)
     id_list = []
     #存入数据库
     for j in range(0, len(emb_array)):
         face_mysql_instant = face_mysql.face_mysql()
-        last_id = face_mysql_instant.insert_facejson(filename_base + "_" + str(j), filename_base + "_" + str(j), 
+        last_id = face_mysql_instant.insert_facejson(filename_base + "_" + str(j), image_path, 
                                                     ",".join(str(li) for li in emb_array[j].tolist()), uid, ugroup)
         id_list.append(str(last_id))
 
@@ -95,6 +104,7 @@ def face_insert():
         request_result['state'] = 'sucess'
     else:
         request_result['state'] = 'error'
+        os.remove(image_path)
 
     print(request_result)
     return json.dumps(request_result)
@@ -102,7 +112,6 @@ def face_insert():
 
 @app.route('/face/query', methods=['POST'])
 def face_query():
-
     #获取查询条件  在ugroup中查找相似的人脸
     ugroup = request.form['ugroup']
     upload_files = request.files['imagefile']
@@ -113,24 +122,28 @@ def face_query():
     #获取post请求的图片到本地
     file = upload_files
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        filename = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-") + secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image_path = os.path.join(pwd, image_path)
         print(image_path)
 
-        img = cv2.imread(image_path)
+        #img = cv2.imread(image_path)
         image = face_recognition.load_image_file(image_path)
         face_locations = face_recognition.face_locations(image)
         emb_array = face_recognition.face_encodings(image, face_locations)
+        os.remove(image_path)
+        #if emb_array.shape[0] == 1:
+        #    return json.dumps({'error': "not found face"})
         face_query = matrix_fun.matrix()
         #分别获取距离该图片中人脸最相近的人脸信息
         # pic_min_scores 是数据库中人脸距离（facenet计算人脸相似度根据人脸距离进行的）
         # pic_min_names 是当时入库时保存的文件名
         # pic_min_uid  是对应的用户id
-        pic_min_scores, pic_min_names, pic_min_uid = face_query.get_socres(emb_array, ugroup)
-
+        pic_min_scores, pic_min_names, pic_min_uid = face_query.get_socres(np.array(emb_array), ugroup)
         #如果提交的query没有group 则返回
-        if len(pic_min_scores) == 0: return json.dumps({'error': "not found user group"})
+        if len(pic_min_scores) == 0:
+            return json.dumps({'error': "not found user group"})
 
         for i in range(0, len(pic_min_scores)):
             if pic_min_scores[i]<MAX_DISTINCT:
@@ -146,11 +159,37 @@ def face_query():
 
 @app.route('/rock/correct', methods=['POST'])
 def rock_correct():
-    return json.dumps({"state":"success"})
+    upload_files = request.files['imagefile']
+    #从post请求图片保存到本地路径中
+    file = upload_files
+    if file and allowed_file(file.filename):
+        filename = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-") + secure_filename(file.filename)
+        file.save(os.path.join(app.config['ROCK_FOLDER'], filename))
+    image_path = os.path.join(app.config['ROCK_FOLDER'], filename)
+    image_path = os.path.join(pwd, image_path)
+    print(image_path)
+    image_data = open(image_path, "rb").read()
+    response = make_response(image_data)
+    response.headers['Content-Type'] = 'image/png'
+    return response
 
 @app.route('/rock/split', methods=['POST'])
 def rock_split():
-    return json.dumps({"state":"success"})
+    upload_files = request.files.getlist('imagefile')
+    #从post请求图片保存到本地路径中
+    filenames = []
+    for file in upload_files:
+        if file and allowed_file(file.filename):
+            filename = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-") + secure_filename(file.filename)
+            file.save(os.path.join(app.config['ROCK_FOLDER'], filename))
+            filenames.append(filename)
+    image_path = os.path.join(app.config['ROCK_FOLDER'], filename)
+    image_path = os.path.join(pwd, image_path)
+    print(image_path)
+    image_data = open(image_path, "rb").read()
+    response = make_response(image_data)
+    response.headers['Content-Type'] = 'image/png'
+    return response
 
 # 备用 通过urllib的方式从远程地址获取一个图片到本地
 # 利用该方法可以提交一个图片的url地址，则也是先保存到本地再进行后续处理

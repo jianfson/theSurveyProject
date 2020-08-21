@@ -16,6 +16,7 @@ the Survey Project.
 `Flask` 
 `Flask-HTTPAuth` 
 `face_recognition` 
+`cv2` 
 
 ## 提前建立数据库 
 database.sql 
