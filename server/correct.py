@@ -16,12 +16,12 @@ principal_point = None
 focal_length = 1102.79
 seed = 1337
 
-img = '/media/jiangxin/data/theSurveyProject/theSurveyProject/server/rock_temp/3x.jpg'
+img = '/media/jiangxin/data/theSurveyProject/theSurveyProject/server/rock_temp/1x.jpg'
 
 vpd = VPDetection(length_thresh, principal_point, focal_length, seed)
 vps = vpd.find_vps(img)
 print(vps)
-vpd.create_debug_VP_image(True)
+vpd.create_debug_VP_image(True, "result.jpg")
 exit()
 
 img = cv2.imread('/media/jiangxin/data/theSurveyProject/theSurveyProject/server/rock_temp/1x.jpg')

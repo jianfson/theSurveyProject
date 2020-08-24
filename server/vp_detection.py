@@ -579,14 +579,14 @@ class VPDetection(object):
                 cv2.line(img, (int(x1), int(y1)), (int(x2), int(y2)),
                          colours[i], 2, cv2.LINE_AA)
 
+        # Save image if necessary
+        if save_image is not None and save_image != '':
+            cv2.imwrite(save_image, img)
+
         # Show image if necessary
         if show_image:
             cv2.imshow('VP Debug Image', img)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
-
-        # Save image if necessary
-        if save_image is not None and save_image != '':
-            cv2.imwrite(save_image, img)
 
         return img
