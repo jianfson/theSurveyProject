@@ -17,6 +17,7 @@ the Survey Project.
 `Flask-HTTPAuth` 
 `face_recognition` 
 `cv2` 
+pip3 install -U opencv-python==4.0.0.21  
 
 ## 提前建立数据库 
 database.sql 
