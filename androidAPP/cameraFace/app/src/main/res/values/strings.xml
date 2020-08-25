@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">cameraFace</string>
+    <string name="camera">Camera 人脸检测</string>
 </resources>
