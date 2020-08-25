@@ -168,7 +168,7 @@ def rock_correct():
     image_path = os.path.join(app.config['ROCK_FOLDER'], filename)
     image_path = os.path.join(pwd, image_path)
     print(image_path)
-    image_data = open(image_path, "rb").read()
+    image_data = open("dst.jpg", "rb").read()
     response = make_response(image_data)
     response.headers['Content-Type'] = 'image/png'
     return response
@@ -186,7 +186,7 @@ def rock_split():
     image_path = os.path.join(app.config['ROCK_FOLDER'], filename)
     image_path = os.path.join(pwd, image_path)
     print(image_path)
-    image_data = open(image_path, "rb").read()
+    image_data = open("dst.jpg", "rb").read()
     response = make_response(image_data)
     response.headers['Content-Type'] = 'image/png'
     return response
