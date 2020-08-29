@@ -7,4 +7,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <string name="face_detect_success">检测到人脸</string>
+
 </resources>

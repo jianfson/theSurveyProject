@@ -17,7 +17,6 @@ object BitmapUtils {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
         return os.toByteArray()
     }
-
     fun mirror(rawBitmap: Bitmap): Bitmap {
         var matrix = Matrix()
         matrix.postScale(-1f, 1f)

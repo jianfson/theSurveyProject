@@ -5,8 +5,14 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
+import android.widget.Toast
+import com.survey.cameraface.R
 
 class FaceView : View {
+
+
+
+
     lateinit var mPaint: Paint
     private var mCorlor = "#42ed45"
     private var mFaces: ArrayList<RectF>? = null
@@ -29,8 +35,8 @@ class FaceView : View {
         mPaint.style = Paint.Style.STROKE
         mPaint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, context.resources.displayMetrics)
         mPaint.isAntiAlias = true
-    }
 
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -39,10 +45,12 @@ class FaceView : View {
                 canvas.drawRect(face, mPaint)
             }
         }
+
     }
 
     fun setFaces(faces: ArrayList<RectF>) {
         this.mFaces = faces
         invalidate()
+
     }
 }
