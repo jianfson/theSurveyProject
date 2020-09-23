@@ -10,10 +10,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.WindowManager
 import com.survey.cameraface.R
 import com.survey.cameraface.ResultActivity
+import com.survey.cameraface.util.log
 import kotlinx.android.synthetic.main.activity_camera_face.*
+import org.opencv.android.OpenCVLoader
 
 class CameraActivityFace : AppCompatActivity(), CameraHelperFace.FaceDetectListener {
-    private lateinit var cameraHelperFace: CameraHelperFace         // 初始化CameraHelperFace，延迟初始化
+    private lateinit var cameraHelperFace: CameraHelperFace         //延迟初始化CameraHelperFace
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,23 +31,30 @@ class CameraActivityFace : AppCompatActivity(), CameraHelperFace.FaceDetectListe
 
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        //初始化使用本地native库
+        OpenCVLoader.initDebug()
+    }
+
     override fun onFaceDetect(faces: Array<Face>, facesRect: ArrayList<RectF>) {
         faceView.setFaces(facesRect)
         if (CameraHelperFace.IsFaceDetected) {
             cameraHelperFace.takePic()
-            cameraHelperFace.releaseCamera()
-
-            var intent = Intent(this, ResultActivity::class.java)
-            var bundle = Bundle()
-            bundle.putString("ImagePath", "/storage/emulated/0/CameraDemo/camera2/IMG_20200829_222552.jpg")               //图片地址
-            intent.putExtras(intent)
-            startActivity(intent)
+            startActivity(Intent(this, ResultActivity::class.java))
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        log("onPause")
+        cameraHelperFace.releaseCamera()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraHelperFace.releaseCamera()
+        log("onDestroy")
         cameraHelperFace.releaseThread()
     }
 

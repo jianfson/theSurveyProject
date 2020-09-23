@@ -2,7 +2,6 @@ package com.survey.cameraface;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -18,32 +17,37 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         Button signin = (Button) findViewById(R.id.signin);
 
-
-
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String name = ((EditText) findViewById(R.id.etname)).getText().toString();
                 String password = ((EditText) findViewById(R.id.etpassword)).getText().toString();
-                if (UserService.signIn(name, password))
+
+
+                Intent intent = new Intent();
+                intent.setClass(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+                Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+
+                //为确保演示顺利，禁用下列代码
+/*                if (UserService.signIn(name, password))
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-
                             Intent intent = new Intent();
                             intent.setClass(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
+                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                         }
                     });
                 else {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
                         }
                     });
-                }
+                }*/
             }
         });
 
@@ -73,4 +77,5 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }
+
 }

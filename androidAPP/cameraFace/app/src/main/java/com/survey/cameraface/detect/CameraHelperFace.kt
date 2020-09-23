@@ -19,12 +19,16 @@ import android.util.Size
 import android.view.Surface
 import android.view.TextureView
 import androidx.annotation.RequiresApi
+import com.survey.cameraface.ImgService
+import com.survey.cameraface.ResultActivity
 import com.survey.cameraface.util.log
 import com.survey.cameraface.util.toast
 import com.survey.cameraface.util.BitmapUtils
 import com.survey.cameraface.view.AutoFitTextureView
 import java.util.*
 import kotlin.collections.ArrayList
+
+import org.opencv.android.OpenCVLoader
 
 /*
 布局中使用 AutoFitTextureView 代替 TextureView。AutoFitTextureView 继承自 TextureView，
@@ -400,6 +404,19 @@ class CameraHelperFace(val mActivity: Activity, private val mTextureView: AutoFi
         val byteBuffer = image.planes[0].buffer
         val byteArray = ByteArray(byteBuffer.remaining())
         byteBuffer.get(byteArray)
+
+        //将图片发送到服务器
+        //想办法传入这个参数！！！！！！！！！！！！！！！！
+        if (ImgService.UploadImg(byteArray)){
+            mActivity.runOnUiThread {
+                mActivity.toast("上传成功")
+            }
+        }else{
+            mActivity.runOnUiThread {
+                mActivity.toast("上传失败")
+            }
+        }
+
         image.close()
         BitmapUtils.savePic(byteArray, mCameraSensorOrientation == 270, { savedPath, time ->
             mActivity.runOnUiThread {
@@ -481,11 +498,9 @@ class CameraHelperFace(val mActivity: Activity, private val mTextureView: AutoFi
             super.onCaptureCompleted(session, request, result)
             if (openFaceDetect && mFaceDetectMode != CaptureRequest.STATISTICS_FACE_DETECT_MODE_OFF) {
                 handleFaces(result)             //预览会话的回调函数中对检测到的人脸进行处理，并将结果回调给Activity
-
             }
             canExchangeCamera = true
             canTakePic = true
-
         }
 
         override fun onCaptureFailed(

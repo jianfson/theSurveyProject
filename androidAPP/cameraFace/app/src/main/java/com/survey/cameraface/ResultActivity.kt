@@ -1,5 +1,6 @@
 package com.survey.cameraface
 
+import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,10 +12,10 @@ class ResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result)
 
-        var bundle = this.intent.extras
-        var mFacePath = bundle?.getString("ImagePath")
 
-        var mFaceBitmap = BitmapFactory.decodeFile(mFacePath)
-        imageView.setImageBitmap(mFaceBitmap)
+
+        backHome_btn.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
+        }
     }
 }
