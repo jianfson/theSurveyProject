@@ -19,6 +19,8 @@ import cv2
 import datetime
 import time
 
+import image_warp
+
 app = Flask(__name__)
 # 图片最大为16M
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -167,8 +169,15 @@ def rock_correct():
         file.save(os.path.join(app.config['ROCK_FOLDER'], filename))
     image_path = os.path.join(app.config['ROCK_FOLDER'], filename)
     image_path = os.path.join(pwd, image_path)
+    dst_image_path = "dst_" + filename
+    dst_image_path = os.path.join(app.config['ROCK_FOLDER'], dst_image_path)
+    dst_image_path = os.path.join(pwd, dst_image_path)
     print(image_path)
-    image_data = open("dst.jpg", "rb").read()
+    print(dst_image_path)
+    image_warp.image_warp(image_path, dst_image_path)
+    image_data = open(dst_image_path, "rb").read()
+    os.remove(image_path)
+    os.remove(dst_image_path)
     response = make_response(image_data)
     response.headers['Content-Type'] = 'image/png'
     return response
@@ -182,11 +191,18 @@ def rock_split():
         if file and allowed_file(file.filename):
             filename = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-") + secure_filename(file.filename)
             file.save(os.path.join(app.config['ROCK_FOLDER'], filename))
-            filenames.append(filename)
-    image_path = os.path.join(app.config['ROCK_FOLDER'], filename)
+            image_path = os.path.join(app.config['ROCK_FOLDER'], filename)
+            image_path = os.path.join(pwd, image_path)
+            filenames.append(image_path)
+    dst_image_path = "dst_"+ datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-") + "split.jpg"
+    image_path = os.path.join(app.config['ROCK_FOLDER'], dst_image_path)
     image_path = os.path.join(pwd, image_path)
     print(image_path)
-    image_data = open("dst.jpg", "rb").read()
+    image_warp.image_split(filenames, dst_image_path)
+    image_data = open(dst_image_path, "rb").read()
+    os.remove(dst_image_path)
+    for filename in filenames:
+        os.remove(filename)
     response = make_response(image_data)
     response.headers['Content-Type'] = 'image/png'
     return response
