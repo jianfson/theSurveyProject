@@ -233,6 +233,12 @@ def convertjpg(jpgfile, width=1440, height=500):
         print(e)
 
 def image_warp(image_path, save_path):
+    #step1: warp image by using vanishing_points.
+    #step2: detect feature picture.
+    #step3: warp feature image by using Registration algrithm.
+    #step4: compute the angles using Registration.
+    #step5: Determine whether to rotate image or not by using angles.
+    #step6: how to crop the rock feature?
     img = io.imread(image_path)
     img_copy = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     lsd = cv2.createLineSegmentDetector(0)
@@ -253,6 +259,8 @@ def image_warp(image_path, save_path):
     io.imsave(save_path, warped_img)
 
 def image_split(jpgfiles, outdir, width=1440, height=500):
+    #step1: Determine whether to warp images based on the shape of all images.
+    #step2: split images directly.
     joint = Image.new('RGB', (width, height*len(jpgfiles)))
     for i in range(len(jpgfiles)):
         convertfile = convertjpg(jpgfiles[i], width, height)
