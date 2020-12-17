@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center|center_horizontal|center_vertical">
+
+    <Button
+        android:id="@+id/FaceDetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="人脸检测"/>
+    <Button
+        android:id="@+id/sharpnessDetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="清晰度检测"/>
+
+    <Button
+        android:id="@+id/galleryBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="岩心校正" />
+
+    <Button
+        android:id="@+id/splitjoinBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="岩心拼接"/>
+
+    <Button
+        android:id="@+id/takeStonePhoto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="现场岩心校正"/>
+
+</LinearLayout>
