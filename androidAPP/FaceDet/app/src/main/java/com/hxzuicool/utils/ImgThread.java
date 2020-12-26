@@ -1,5 +1,6 @@
 package com.hxzuicool.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -14,9 +15,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 public class ImgThread extends Thread {
+    private static final String TAG = "ImgThread";
     private final String path;
     private ArrayList<String> imgPaths;
     private String imgStr;
@@ -24,6 +27,7 @@ public class ImgThread extends Thread {
     private boolean result = false;
     private String returnImgPath;
     private String userGroup;
+    private Context context;
 
     /**
      * 岩心拼接上传
@@ -31,10 +35,11 @@ public class ImgThread extends Thread {
      * @param upType 上传图片的类型
      * @param imgPaths 岩心拼接的多张图片list
      */
-    public ImgThread(String path, int upType, ArrayList<String> imgPaths) {
+    public ImgThread(String path, ArrayList<String> imgPaths, int upType, Context context) {
         this.path = path;
-        this.upType = upType;
         this.imgPaths = imgPaths;
+        this.upType = upType;
+        this.context = context;
     }
 
     public ImgThread(String path, String imgStr, int upType, String userGroup) {
@@ -44,10 +49,11 @@ public class ImgThread extends Thread {
         this.userGroup = userGroup;
     }
 
-    public ImgThread(String path, String imgStr, int upType) {
+    public ImgThread(String path, String imgStr, int upType, Context context) {
         this.path = path;
         this.imgStr = imgStr;
         this.upType = upType;
+        this.context = context;
     }
 
     @Override
@@ -82,11 +88,11 @@ public class ImgThread extends Thread {
                             "\r\n" +
                             "\r\n";
                     dos.write(text1.getBytes());
-                    //写入图片数据
                     dos.write(JavaImageUtil.getImgByte(imgStr));
                     dos.write("\r\n".getBytes());
                     break;
                 case 2:
+                case 3:
                     for (int i = 0; i < imgPaths.size(); i++) {
                         String text2 = "--" + "---------------------------123821742118716" +
                                 "\r\n" + "Content-Disposition: form-data; name=\"imagefile\"; filename=\"" + "test" + i + ".jpg" + "\"" +
@@ -94,7 +100,6 @@ public class ImgThread extends Thread {
                                 "\r\n" +
                                 "\r\n";
                         dos.write(text2.getBytes());
-                        //写入图片数据
                         dos.write(JavaImageUtil.getImgByte(imgPaths.get(i)));
                         dos.write("\r\n".getBytes());
                     }
@@ -106,12 +111,16 @@ public class ImgThread extends Thread {
             dos.write(endData);
             dos.flush();
             dos.close();
+            long startTime = System.currentTimeMillis();
             result = (httpURLConnection.getResponseCode() == 200);
             Log.e("ImgThread", String.valueOf(httpURLConnection.getResponseCode()));
             if (result) {
                 InputStream imgIs = httpURLConnection.getInputStream();
+                long endTime = System.currentTimeMillis();
+                Log.e(TAG, "服务器处理图像时间：" + (endTime - startTime) / 1000 + "秒");
                 switch (upType) {
                     case 0:
+                    case 3:
                         BufferedReader in = new BufferedReader(
                                 new InputStreamReader(httpURLConnection.getInputStream()));
                         String line;
@@ -126,12 +135,14 @@ public class ImgThread extends Thread {
                         break;
                     case 1:
                         Bitmap bitmap1 = BitmapFactory.decodeStream(imgIs);
-                        returnImgPath = JavaImageUtil.saveImage(bitmap1, Environment.getExternalStorageDirectory() + "/CameraDemo/camera2/");
+                        returnImgPath = JavaImageUtil.saveImage(bitmap1, Environment.getExternalStorageDirectory() + "/CameraDemo/ImageReviseResult/", context);
+                        httpURLConnection.disconnect();
                         imgIs.close();
                         break;
                     case 2:
                         Bitmap bitmap2 = BitmapFactory.decodeStream(imgIs);
-                        returnImgPath = JavaImageUtil.saveImage(bitmap2, Environment.getExternalStorageDirectory() + "/CameraDemo/joint/");
+                        returnImgPath = JavaImageUtil.saveImage(bitmap2, Environment.getExternalStorageDirectory() + "/CameraDemo/ImageJointResult/", context);
+                        httpURLConnection.disconnect();
                         imgIs.close();
                         break;
                     default:

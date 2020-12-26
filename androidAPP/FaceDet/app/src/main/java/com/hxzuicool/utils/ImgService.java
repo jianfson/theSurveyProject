@@ -1,9 +1,12 @@
 package com.hxzuicool.utils;
 
 
+import android.content.Context;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * @author hxzuicool
@@ -13,17 +16,18 @@ public class ImgService {
      * 找到Java的ByteArray类型
      * @param imgStr 图片的地址
      * @param upType 上传图片的类型选择
-     * @return
+     * @return 返回结果和服务器处理图片（如果有的话）
      */
-    public static String[] uploadImg(String imgStr, int upType) {
+    public static String[] uploadImg(String imgStr, int upType, Context context) {
 
-        String[] pathroute = {"http://47.108.134.136:5256/face/query","http://47.108.134.136:5256/rock/correct"};
+        String[] pathRoute = {"http://47.108.134.136:5256/face/query", "http://47.108.134.136:5256/rock/correct"};
         // 写上传图片的方法
-        ImgThread imgThread = new ImgThread(pathroute[upType], imgStr, upType);
+        ImgThread imgThread = new ImgThread(pathRoute[upType], imgStr, upType, context);
         try{
             imgThread.start();
             imgThread.join();
         } catch (InterruptedException e){
+            System.out.println("uploadImg1");
             e.printStackTrace();
         }
         String[] str = new String[2];
@@ -36,6 +40,32 @@ public class ImgService {
         return str;
     }
 
+    /**
+     * 上传岩心拼接和批量岩心校正
+     * @param mImagePaths 相册选择图片返回
+     * @param upType 上传类型
+     * @param context Activity context
+     * @return 返回结果和服务器处理图片（如果有的话）
+     */
+    public static String[] uploadImg(ArrayList<String> mImagePaths, int upType, Context context) {
+
+        String[] pathRoute = {"", "", "http://47.108.134.136:5256/rock/split", "http://47.108.134.136:5256/rock/batch_correct"};
+        ImgThread imgThread = new ImgThread(pathRoute[upType], mImagePaths, upType, context);
+        imgThread.start();
+        try {
+            imgThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        String[] str = new String[2];
+        if (imgThread.getResult()) {
+            str[0] = "true";
+        } else {
+            str[0] = "false";
+        }
+        str[1] = imgThread.getReturnImgPath();
+        return str;
+    }
 
     /**
      * 上传人脸向量

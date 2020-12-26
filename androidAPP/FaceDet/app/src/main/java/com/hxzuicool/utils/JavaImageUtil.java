@@ -1,8 +1,11 @@
 package com.hxzuicool.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.Image;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -102,17 +105,23 @@ public class JavaImageUtil {
         return imgStd > 12;
     }
 
-    public static String saveImage(Bitmap bitmap, String imgPath) throws IOException {
+    public static String saveImage(Bitmap bitmap, String imgPath, Context context) throws IOException {
 
         File file = new File(imgPath);
         if (!file.exists()){
             file.mkdirs();
         }
-        String imageNameStr = String.valueOf(System.currentTimeMillis());
+        String imageNameStr = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         FileOutputStream outputStream = new FileOutputStream(imgPath + imageNameStr + ".jpg");
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
         outputStream.flush();
         outputStream.close();
+        MediaScannerConnection.scanFile(context, new String[]{imgPath + imageNameStr + ".jpg"}, new String[]{"image/jepg"}, new MediaScannerConnection.OnScanCompletedListener() {
+            @Override
+            public void onScanCompleted(String path, Uri uri) {
+
+            }
+        });
         return imgPath + imageNameStr + ".jpg";
     }
     /**

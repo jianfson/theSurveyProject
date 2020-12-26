@@ -1,10 +1,12 @@
 package com.hxzuicool;
 
+import android.app.Service;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.hxzuicool.chooseimage.ChooseImageActivity;
+import com.hxzuicool.chooseimage.StoneCoreJointActivity;
 import com.hxzuicool.utils.ImgService;
 import com.hxzuicool.utils.JavaImageUtil;
 import com.mv.livebodyexample.AliveDetMainActivity;
@@ -47,11 +49,13 @@ public class ChooseActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose);
-        // 人脸检测
+        final Vibrator mVibrator = (Vibrator) getSystemService(Service.VIBRATOR_SERVICE);
+
+        // 人脸识别
         findViewById(R.id.FaceDetBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                View inflate = View.inflate(ChooseActivity.this, R.layout.users, null);
+                View inflate = View.inflate(ChooseActivity.this, R.layout.usergroup, null);
                 final EditText groupText = inflate.findViewById(R.id.users);
                 Button confirmBtn = inflate.findViewById(R.id.confirmBtn);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(ChooseActivity.this).setTitle("输入用户组").setView(inflate);
@@ -66,6 +70,7 @@ public class ChooseActivity extends AppCompatActivity {
                             intent.putExtra("userGroup", groupText.getText().toString());
                             startActivity(intent);
                         } else {
+                            mVibrator.vibrate(100);
                             Toast.makeText(ChooseActivity.this,"必须要输入用户组才能进入人脸识别功能！\n" +
                                                                             "           输入错误可能导致无法上传！", Toast.LENGTH_SHORT).show();
                         }
@@ -73,28 +78,31 @@ public class ChooseActivity extends AppCompatActivity {
                 });
             }
         });
+
         //清晰度检测
-        findViewById(R.id.sharpnessDetBtn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(ChooseActivity.this, SharpnessDetActivity.class));
-            }
-        });
+//        findViewById(R.id.sharpnessDetBtn).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(ChooseActivity.this, SharpnessDetActivity.class));
+//            }
+//        });
+
         //岩心校正
-        findViewById(R.id.galleryBtn).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.stoneRevise).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(ChooseActivity.this, "Pick one image", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(ChooseActivity.this, ImageCorrectionActivity.class));
+                startActivity(new Intent(ChooseActivity.this, StoneCoreReviseActivity.class));
             }
         });
+
         //岩心拼接
         findViewById(R.id.splitjoinBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ChooseActivity.this, ChooseImageActivity.class));
+                startActivity(new Intent(ChooseActivity.this, StoneCoreJointActivity.class));
             }
         });
+
         //现场岩心拍照
         findViewById(R.id.takeStonePhoto).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,6 +123,14 @@ public class ChooseActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
             }
         });
+
+        //批量校正
+        findViewById(R.id.stonesRevise).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ChooseActivity.this, StonesReviseActivity.class));
+            }
+        });
     }
 
     @Override
@@ -123,7 +139,7 @@ public class ChooseActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Log.e(TAG, String.valueOf(photoFile));
             if (JavaImageUtil.isStoneSharpnessDet(photoFile.toString())) {
-                String[] strings = ImgService.uploadImg(photoFile.toString(), 1);
+                String[] strings = ImgService.uploadImg(photoFile.toString(), 1, getApplicationContext());
                 Log.e(TAG, "onActivityResult: " + strings[1] );
                 if ("true".equals(strings[0])) {
                     Toast.makeText(this, "上传成功！", Toast.LENGTH_SHORT).show();

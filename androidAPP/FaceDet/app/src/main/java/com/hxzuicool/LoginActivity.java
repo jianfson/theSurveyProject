@@ -23,6 +23,8 @@ import com.mv.livebodyexample.R;
 public class LoginActivity extends AppCompatActivity {
 
 
+    private static final String TAG = "LoginActivity";
+
     static {
         System.loadLibrary("opencv_java3");
     }
@@ -32,40 +34,23 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         //加载Dlib的模型文件
-        System.out.println(new Live().initDlibLandMarks(getAssets(),"shape_predictor_68_face_landmarks.dat"));
-        System.out.println(new Live().initDlib128Vector(getAssets(), "dlib_face_recognition_resnet_model_v1.dat"));
-//        ProgressDialog.show(this, "资源加载中", "资源加载中，请稍后...", true, false);
+        Live live = new Live();
+        System.out.println("加载模型文件1成功！" + live.initDlibLandMarks(getAssets(), "shape_predictor_68_face_landmarks.dat"));
+        System.out.println("加载模型文件2成功！" + live.initDlib128Vector(getAssets(), "dlib_face_recognition_resnet_model_v1.dat"));
+
         requestPower();
-        Button signin = (Button) findViewById(R.id.signin);
+
+        Button signin = findViewById(R.id.signin);
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String name = ((EditText) findViewById(R.id.etname)).getText().toString();
                 String password = ((EditText) findViewById(R.id.etpassword)).getText().toString();
 
-
                 Intent intent = new Intent();
                 intent.setClass(LoginActivity.this, ChooseActivity.class);
                 startActivity(intent);
                 Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-/*                if (UserService.signIn(name, password))
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Intent intent = new Intent();
-                            intent.setClass(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }*/
             }
         });
     }

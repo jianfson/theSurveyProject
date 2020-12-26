@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:allowBackup="true"
@@ -38,8 +39,9 @@
         <activity android:name="com.hxzuicool.ChooseActivity"/>
         <activity android:name="com.hxzuicool.SharpnessDetActivity"/>
         <activity android:name="com.hxzuicool.ReturnImageViewActivity"/>
-        <activity android:name="com.hxzuicool.chooseimage.ChooseImageActivity"/>
-        <activity android:name="com.hxzuicool.ImageCorrectionActivity"/>
+        <activity android:name="com.hxzuicool.chooseimage.StoneCoreJointActivity"/>
+        <activity android:name="com.hxzuicool.StoneCoreReviseActivity"/>
+        <activity android:name="com.hxzuicool.StonesReviseActivity"/>
     </application>
 
 </manifest>

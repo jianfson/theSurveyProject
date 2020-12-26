@@ -197,7 +197,7 @@ class AliveDetMainActivity : AppCompatActivity(),
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }
-                    mActivity.runOnUiThread { isAnglePass.text = "没有识别到人脸...无角度数据..." }
+//                    mActivity.runOnUiThread { isAnglePass.text = "没有识别到人脸...无角度数据..." }
                     // 开始计时总检测时间
                     faceDetTime = System.currentTimeMillis()
                 }
@@ -329,10 +329,8 @@ class AliveDetMainActivity : AppCompatActivity(),
                                                     0,
                                                     face128String.length - 1
                                                 )
-                                                println(face128String)
                                                 val userGroup =
                                                     intent.getStringExtra("userGroup")
-                                                println("!!!!!!!!!!!!!!!!!$userGroup")
                                                 if (ImgService.uploadFaceVector(face128String, userGroup)) {
                                                     mActivity.runOnUiThread {
                                                         faceDetRemind.text = "上传成功"
